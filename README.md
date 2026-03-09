@@ -66,12 +66,24 @@ chmod +x scripts/*.sh
 ```
 
 ### Prepare config
+Before running the pipeline, create `pipeline/project_paths.sh` and edit it according to your local environment.
+
+Only this file needs to be modified before running the workflow.  
+You do **not** need to edit each pipeline script individually.
+Example:
 
 ```bash
-cp config/project_paths.example.sh config/project_paths.sh
-```
+cat > pipeline/project_paths.sh <<'EOF'
+RAW_SOURCE_DIR="/mnt/sda/Public/Project/collabration/AoLab/20260206Cut/rawdata"
+PROJECT_DIR="/mnt/sda/Public/Project/collabration/AoLab/20260206Cut/analysis"
+PIPELINE_DIR="/mnt/sda/Public/Project/collabration/AoLab/20260112CHIP/pipeline"
+CONDA_ENV="ChIPseq"
 
-Edit `config/project_paths.sh` before running.
+THREADS=12
+BIN_SIZE=50
+PAIR_MODE="yes"
+EOF
+```
 
 ### Run the workflow
 
