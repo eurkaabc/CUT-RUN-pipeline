@@ -77,7 +77,7 @@ cat > pipeline/project_paths.sh <<'EOF'
 RAW_SOURCE_DIR="/mnt/sda/Public/Project/collabration/AoLab/20260206Cut/rawdata"
 PROJECT_DIR="/mnt/sda/Public/Project/collabration/AoLab/20260206Cut/analysis"
 PIPELINE_DIR="/mnt/sda/Public/Project/collabration/AoLab/20260112CHIP/pipeline"
-CONDA_ENV="ChIPseq"
+CONDA_ENV="/mnt/sda/Public/Environment/miniconda3/envs/ChIP"
 
 THREADS=12
 BIN_SIZE=50
@@ -87,15 +87,24 @@ EOF
 
 ### Run the workflow
 
+First move to the repository directory:
+
+```bash
+cd /mnt/sda/Public/Project/collabration/AoLab/20260112CHIP
+# modify this path according to your local setup
+```
+
+Then run:
+
 ```bash
 # 0. Collect raw FASTQ
-bash scripts/collect_fastq.sh
+bash pipeline/collect_fastq.sh
 
 # 1. QC and genome mapping
-bash scripts/run_qc_map_batch.sh
+bash pipeline/run_qc_map_batch.sh
 
 # 2. Collect clean FASTQ and CPM bigWig
-bash scripts/collect_clean_and_bw.sh
+bash pipeline/collect_clean_and_bw.sh
 ```
 
 ### Spike-in mapping options
