@@ -65,11 +65,21 @@ cd CUT-RUN-pipeline
 chmod +x scripts/*.sh
 ```
 
+### Prepare environment
+
+Before running the pipeline, first activate the conda environment:
+
+```bash
+conda activate /mnt/sda/Public/Environment/miniconda3/envs/ChIP
+```
+
 ### Prepare config
+
 Before running the pipeline, create `pipeline/project_paths.sh` and edit it according to your local environment.
 
 Only this file needs to be modified before running the workflow.  
 You do **not** need to edit each pipeline script individually.
+
 Example:
 
 ```bash
@@ -106,6 +116,7 @@ bash pipeline/run_qc_map_batch.sh
 # 2. Collect clean FASTQ and CPM bigWig
 bash pipeline/collect_clean_and_bw.sh
 ```
+
 
 ### Spike-in mapping options
 
