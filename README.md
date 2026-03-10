@@ -1,10 +1,12 @@
 # CUT&RUN Pipeline 🧬
-A comprehensive bioinformatics pipeline for analyzing CUT&amp;RUN (Cleavage Under Targets and Release Using Nuclease) data
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Language: Bash](https://img.shields.io/badge/Language-Bash-green.svg)](https://www.gnu.org/software/bash/)
 [![Python: 3.6+](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://www.python.org/)
 
-A practical shell-based CUT&RUN analysis workflow for:
+A practical shell-based bioinformatics pipeline for analyzing CUT&RUN (Cleavage Under Targets and Release Using Nuclease) data.
+
+This workflow supports:
 
 - raw FASTQ collection
 - quality control and genome mapping
@@ -21,21 +23,23 @@ This repository reflects a real-world CUT&RUN workflow used on Linux servers for
 
 ## 📋 Overview
 
-CUT&RUN is a chromatin profiling method for mapping protein-DNA interactions with high resolution and low background. This repository provides a practical shell-based CUT&RUN analysis workflow from raw FASTQ files to processed BAM files, normalized bigWig tracks, and peak calls.
+CUT&RUN is a chromatin profiling method for mapping protein-DNA interactions with high resolution and low background. This repository provides a practical shell-based analysis workflow from raw FASTQ files to processed BAM files, normalized bigWig tracks, and peak calls.
 
-The current implementation is based on a lightweight shell workflow and is designed for personal/lab use in a Linux environment.
+The current implementation is designed for personal or lab use in a Linux environment.
 
 ## 🧪 What is CUT&RUN?
 
-CUT&RUN is an in situ method for profiling specific protein-DNA complexes using a target-specific primary antibody together with Protein A/Protein G-micrococcal nuclease (pAG-MNase). In a typical experiment, cells are first immobilized on Concanavalin A-coated magnetic beads to facilitate handling and reduce cell loss during washes. Cells are then permeabilized to allow the antibody to enter the nucleus and bind the target protein, such as a histone mark, transcription factor, or cofactor.
+CUT&RUN is an in situ method for profiling specific protein-DNA complexes using a target-specific primary antibody together with Protein A/Protein G-micrococcal nuclease (pAG-MNase). Cells are typically immobilized on Concanavalin A-coated magnetic beads, permeabilized, and incubated with a primary antibody that recognizes a histone mark, transcription factor, or cofactor of interest.
 
-The pAG-MNase fusion protein subsequently binds the antibody and is thereby targeted to the corresponding chromatin region. After calcium ion (Ca2+) activation, MNase cleaves DNA near the antibody-bound sites, releasing the target chromatin fragments into the supernatant. These released DNA fragments can then be purified and used for downstream qPCR or next-generation sequencing (NGS).
+The pAG-MNase fusion protein is then recruited to the antibody-bound chromatin region. After calcium ion (Ca2+) activation, MNase cleaves DNA near the target sites, releasing chromatin fragments into the supernatant. These DNA fragments can then be purified and used for downstream qPCR or next-generation sequencing (NGS).
 
-Purified DNA is finally used for library construction, genome alignment, signal track generation, and peak calling.
+Purified DNA is subsequently used for library construction, genome alignment, signal track generation, and peak calling.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/7b39a0a1-51df-4588-9cdb-429555fd6ef6" alt="CUT&RUN workflow" width="500">
+  <img src="https://github.com/user-attachments/assets/7b39a0a1-51df-4588-9cdb-429555fd6ef6" alt="CUT&RUN workflow" width="420">
 </p>
+
+
 
 
 ---
@@ -62,15 +66,22 @@ Purified DNA is finally used for library construction, genome alignment, signal 
 ```bash
 git clone https://github.com/eurkaabc/CUT-RUN-pipeline.git
 cd CUT-RUN-pipeline
-chmod +x scripts/*.sh
+chmod +x pipeline/*.sh
 ```
 
 ### Prepare environment
 
-Before running the pipeline, first activate the conda environment:
+For example, on our lab server, the pipeline is usually run in the following conda environment:
 
 ```bash
 conda activate /mnt/sda/Public/Environment/miniconda3/envs/ChIP
+```
+
+If the environment has not been created yet on a new server, it can be recreated with:
+
+```bash
+conda env create -f environment.yml
+conda activate ChIP
 ```
 
 ### Prepare config
@@ -97,15 +108,6 @@ EOF
 
 ### Run the workflow
 
-First move to the repository directory:
-
-```bash
-cd /mnt/sda/Public/Project/collabration/AoLab/20260112CHIP
-# modify this path according to your local setup
-```
-
-Then run:
-
 ```bash
 # 0. Collect raw FASTQ
 bash pipeline/collect_fastq.sh
@@ -123,28 +125,29 @@ bash pipeline/collect_clean_and_bw.sh
 #### Option A. *E. coli* spike-in
 
 ```bash
-bash scripts/run_ecoli_batch.sh
-bash scripts/calc_ecoli_ratio.sh
-bash scripts/make_spike_bw.sh
+bash pipeline/run_ecoli_batch.sh
+bash pipeline/calc_ecoli_ratio.sh
+bash pipeline/make_spike_bw.sh
 ```
 
 #### Option B. *Drosophila melanogaster* (`dm6`) spike-in
 
 ```bash
-bash scripts/02_map_dm6.sh ./output sample_name yes
+bash pipeline/02_map_dm6.sh /path/to/analysis sample_name yes
 ```
 
 ### Peak calling
 
 ```bash
-bash scripts/03_callpeak.sh /path/to/analysis
+bash pipeline/03_callpeak.sh /path/to/analysis
 ```
 
 If needed:
 
 ```bash
-bash scripts/03_callpeak_spikeIN.sh /path/to/analysis
+bash pipeline/03_callpeak_spikeIN.sh /path/to/analysis
 ```
+
 
 
 ---
