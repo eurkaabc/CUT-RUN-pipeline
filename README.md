@@ -237,7 +237,7 @@ bash pipeline/02_map_dm6.sh ./analysis sampleA yes
 For batch processing, one simple example is:
 
 ```bash
-conda activate /home/bing.pan/software/miniconda3/envs/ChIPseq
+conda activate /mnt/sda/Public/Environment/miniconda3/envs/ChIP
 
 outdir=/mnt/sda/Public/Project/collabration/AoLab/20260112CHIP/analysis
 pipe=/mnt/sda/Public/Project/collabration/AoLab/20260112CHIP/pipeline/02_map_dm6.sh
