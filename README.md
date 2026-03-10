@@ -119,8 +119,38 @@ bash pipeline/run_qc_map_batch.sh
 bash pipeline/collect_clean_and_bw.sh
 ```
 
+### Prepare spike-in reference
 
-### Spike-in mapping options
+Spike-in reference files are **not included** in this repository and should be downloaded separately before running the spike-in workflow.
+
+Please make sure the spike-in species used in your experiment matches the downloaded reference genome and alignment index.
+
+#### Option A. *Drosophila melanogaster* (`dm6`) spike-in
+
+Download the `dm6` reference genome and chromosome sizes from UCSC:
+
+```bash
+mkdir -p reference/dm6
+cd reference/dm6
+
+wget https://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/dm6.fa.gz
+wget https://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/dm6.chrom.sizes
+
+gunzip -c dm6.fa.gz > dm6.fa
+bowtie2-build dm6.fa dm6
+```
+
+#### Option B. *E. coli* spike-in
+
+For *E. coli* spike-in, please first determine the exact strain or assembly used in your experiment, then download the corresponding FASTA file and build the Bowtie2 index.
+
+```bash
+mkdir -p reference/ecoli
+cd reference/ecoli
+
+# put your downloaded FASTA file here, for example: ecoli.fa
+bowtie2-build ecoli.fa ecoli
+```
 
 #### Option A. *E. coli* spike-in
 
