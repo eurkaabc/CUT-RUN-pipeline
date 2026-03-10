@@ -119,15 +119,22 @@ bash pipeline/run_qc_map_batch.sh
 bash pipeline/collect_clean_and_bw.sh
 ```
 
-### Prepare spike-in reference
+### Spike-in mapping
 
-Spike-in reference files are **not included** in this repository and should be downloaded separately before running the spike-in workflow.
+Spike-in mapping depends on the experimental design.  
+Different spike-in species require different reference genomes and alignment indexes.
 
-Please make sure the spike-in species used in your experiment matches the downloaded reference genome and alignment index.
+On our lab server, commonly used spike-in references are already available:
 
-#### Option A. *Drosophila melanogaster* (`dm6`) spike-in
+- **E. coli**: `/mnt/sda/Public/Database/Ecoli`
+- **Drosophila melanogaster (`dm6`)**: `/mnt/sda/Public/Database/Drosophila_melanogaster`
 
-Download the `dm6` reference genome and chromosome sizes from UCSC:
+If the required spike-in reference is already available on the server, you can directly proceed to the mapping step below.
+
+<details>
+<summary><strong>If the spike-in reference is not available on your server, click here to download and prepare it</strong></summary>
+
+#### Download and build `dm6` spike-in reference
 
 ```bash
 mkdir -p reference/dm6
@@ -140,17 +147,31 @@ gunzip -c dm6.fa.gz > dm6.fa
 bowtie2-build dm6.fa dm6
 ```
 
-#### Option B. *E. coli* spike-in
+#### Download and build *E. coli* spike-in reference
 
-For *E. coli* spike-in, please first determine the exact strain or assembly used in your experiment, then download the corresponding FASTA file and build the Bowtie2 index.
+For *E. coli* spike-in, please first determine the exact strain or assembly used in your experiment.
+
+Example using **E. coli K-12 MG1655**:
 
 ```bash
 mkdir -p reference/ecoli
 cd reference/ecoli
 
-# put your downloaded FASTA file here, for example: ecoli.fa
+datasets download genome accession GCF_000005845.2 --filename ecoli.zip
+unzip ecoli.zip -d ecoli_dataset
+
+cp ecoli_dataset/ncbi_dataset/data/GCF_000005845.2/*.fna ecoli.fa
 bowtie2-build ecoli.fa ecoli
 ```
+
+If `datasets` is not installed, you may also download the reference genome manually from:
+
+- NCBI Datasets: https://www.ncbi.nlm.nih.gov/datasets/genome/
+- NCBI RefSeq: https://www.ncbi.nlm.nih.gov/refseq/
+
+</details>
+
+### Spike-in mapping options
 
 #### Option A. *E. coli* spike-in
 
@@ -166,6 +187,12 @@ bash pipeline/make_spike_bw.sh
 bash pipeline/02_map_dm6.sh /path/to/analysis sample_name yes
 ```
 
+### Notes
+
+- Please make sure the mapping script uses the correct reference/index path for your server.
+- If your spike-in species is different, the reference genome, Bowtie2 index, and mapping script should be modified accordingly.
+- In our current workflow, *E. coli* and `dm6` are two commonly used spike-in options.
+
 ### Peak calling
 
 ```bash
@@ -177,6 +204,7 @@ If needed:
 ```bash
 bash pipeline/03_callpeak_spikeIN.sh /path/to/analysis
 ```
+
 
 
 
