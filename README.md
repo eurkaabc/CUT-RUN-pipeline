@@ -61,15 +61,14 @@ Purified DNA is subsequently used for library construction, genome alignment, si
 
 ## 🚀 Quick Start
 
-### Installation
+### 1. Installation
 
 ```bash
 git clone https://github.com/eurkaabc/CUT-RUN-pipeline.git
 cd CUT-RUN-pipeline
 chmod +x pipeline/*.sh
 ```
-
-### Prepare environment
+### 2. Prepare environment
 
 For example, on our lab server, the pipeline is usually run in the following conda environment:
 
@@ -84,7 +83,7 @@ conda env create -f environment.yml
 conda activate ChIP
 ```
 
-### Prepare config
+### 3. Prepare config
 
 Before running the pipeline, create `pipeline/project_paths.sh` and edit it according to your local environment.
 
@@ -106,7 +105,7 @@ PAIR_MODE="yes"
 EOF
 ```
 
-### Run the workflow
+### 4. Run the workflow
 
 ```bash
 # 0. Collect raw FASTQ
@@ -119,7 +118,7 @@ bash pipeline/run_qc_map_batch.sh
 bash pipeline/collect_clean_and_bw.sh
 ```
 
-### Spike-in mapping
+### 5. Prepare spike-in reference
 
 Spike-in mapping depends on the experimental design.  
 Different spike-in species require different reference genomes and alignment indexes.
@@ -130,6 +129,15 @@ On our lab server, commonly used spike-in references are already available:
 - **Drosophila melanogaster (`dm6`)**: `/mnt/sda/Public/Database/Drosophila_melanogaster`
 
 If the required spike-in reference is already available on the server, you can directly proceed to the mapping step below.
+
+A compressed backup package `Ref(spike_in)` is also provided for transfer to a new server.
+
+If you use the reference files from `Ref(spike_in)` on another server, you only need to modify the reference/index path in the corresponding mapping script.
+
+For example:
+
+- update the reference/index path in `02_map_ecoli.sh` for *E. coli*
+- update the reference/index path in `02_map_dm6.sh` for `dm6`
 
 <details>
 <summary><strong>If the spike-in reference is not available on your server, click here to download and prepare it</strong></summary>
@@ -146,64 +154,105 @@ wget https://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/dm6.chrom.sizes
 gunzip -c dm6.fa.gz > dm6.fa
 bowtie2-build dm6.fa dm6
 ```
+Alternatively, you can use the compressed backup package `Ref(spike_in)`, which contains both *E. coli* and `dm6` references.
 
-#### Download and build *E. coli* spike-in reference
 
-For *E. coli* spike-in, please first determine the exact strain or assembly used in your experiment.
-
-Example using **E. coli K-12 MG1655**:
-
-```bash
-mkdir -p reference/ecoli
-cd reference/ecoli
-
-datasets download genome accession GCF_000005845.2 --filename ecoli.zip
-unzip ecoli.zip -d ecoli_dataset
-
-cp ecoli_dataset/ncbi_dataset/data/GCF_000005845.2/*.fna ecoli.fa
-bowtie2-build ecoli.fa ecoli
-```
-
-If `datasets` is not installed, you may also download the reference genome manually from:
-
-- NCBI Datasets: https://www.ncbi.nlm.nih.gov/datasets/genome/
-- NCBI RefSeq: https://www.ncbi.nlm.nih.gov/refseq/
 
 </details>
 
-### Spike-in mapping options
+### 6. Spike-in mapping options
 
-#### Option A. *E. coli* spike-in
+Choose the appropriate spike-in mapping script according to your experimental design:
+
+- **Option A. *E. coli* spike-in**
+- **Option B. *Drosophila melanogaster* (`dm6`) spike-in**
+
+<details>
+<summary><strong>Option A. E. coli spike-in</strong></summary>
+
+If you are using the prebuilt *E. coli* reference on our lab server, you can run the spike-in mapping directly.
+
+If you are running this workflow on another server and downloaded the reference by yourself, please update the following lines in `02_map_ecoli.sh` first:
 
 ```bash
-bash pipeline/run_ecoli_batch.sh
+ref="/mnt/sda/Public/Database/Ecoli"
+chip="/home/bing.pan/software/miniconda3/envs/ChIPseq/bin"
+```
+
+Then run:
+
+```bash
+bash pipeline/02_map_ecoli.sh <analysis_path> <sample_name> yes
+```
+
+For batch processing, one simple example is:
+
+```bash
+conda activate /home/bing.pan/software/miniconda3/envs/ChIPseq
+
+outdir=/mnt/sda/Public/Project/collabration/AoLab/20260112CHIP/analysis
+pipe=/mnt/sda/Public/Project/collabration/AoLab/20260112CHIP/pipeline/02_map_ecoli.sh
+
+samples=$(ls $outdir/2.cleandata/*_clean.R1.fq.gz | sed 's/_clean.R1\.fq\.gz$//' | xargs -n1 basename | sort -u)
+
+for sample in $samples; do
+  echo "=== Processing: $sample ==="
+  sh "$pipe" "$outdir" "$sample" yes
+done
+```
+
+If needed, you can then continue with downstream spike-in normalization scripts such as:
+
+```bash
 bash pipeline/calc_ecoli_ratio.sh
 bash pipeline/make_spike_bw.sh
 ```
 
-#### Option B. *Drosophila melanogaster* (`dm6`) spike-in
+</details>
+
+<details>
+<summary><strong>Option B. Drosophila melanogaster (dm6) spike-in</strong></summary>
+
+If you are using the prebuilt `dm6` reference on our lab server, you can run the spike-in mapping directly.
+
+If you are running this workflow on another server and downloaded the reference by yourself, please update the following lines in `02_map_dm6.sh` first:
 
 ```bash
-bash pipeline/02_map_dm6.sh /path/to/analysis sample_name yes
+ref="/mnt/sda/Public/Database/Drosophila_melanogaster"
+chip="/home/bing.pan/software/miniconda3/envs/ChIPseq/bin"
 ```
 
-### Notes
-
-- Please make sure the mapping script uses the correct reference/index path for your server.
-- If your spike-in species is different, the reference genome, Bowtie2 index, and mapping script should be modified accordingly.
-- In our current workflow, *E. coli* and `dm6` are two commonly used spike-in options.
-
-### Peak calling
+Then run:
 
 ```bash
-bash pipeline/03_callpeak.sh /path/to/analysis
+bash pipeline/02_map_dm6.sh <analysis_path> <sample_name> yes
 ```
 
-If needed:
+For example:
 
 ```bash
-bash pipeline/03_callpeak_spikeIN.sh /path/to/analysis
+bash pipeline/02_map_dm6.sh ./analysis sampleA yes
 ```
+
+For batch processing, one simple example is:
+
+```bash
+conda activate /home/bing.pan/software/miniconda3/envs/ChIPseq
+
+outdir=/mnt/sda/Public/Project/collabration/AoLab/20260112CHIP/analysis
+pipe=/mnt/sda/Public/Project/collabration/AoLab/20260112CHIP/pipeline/02_map_dm6.sh
+
+samples=$(ls $outdir/2.cleandata/*_clean.R1.fq.gz | sed 's/_clean.R1\.fq\.gz$//' | xargs -n1 basename | sort -u)
+
+for sample in $samples; do
+  echo "=== Processing: $sample ==="
+  sh "$pipe" "$outdir" "$sample" yes
+done
+```
+
+</details>
+
+
 
 
 
