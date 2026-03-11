@@ -196,7 +196,7 @@ bash pipeline/02_map_ecoli.sh <analysis_path> <sample_name> yes
 For batch processing, one simple example is:
 
 ```bash
-conda activate /home/bing.pan/software/miniconda3/envs/ChIPseq
+conda activate /mnt/sda/Public/Environment/miniconda3/envs/ChIP
 
 outdir=/mnt/sda/Public/Project/collabration/AoLab/20260112CHIP/analysis
 pipe=/mnt/sda/Public/Project/collabration/AoLab/20260112CHIP/pipeline/02_map_ecoli.sh
@@ -260,8 +260,33 @@ done
 
 </details>
 
+需要修改这里，根据你的实际情况修改：
+python - <<'PY'
+rows = [
+    ["GZ26005976-WT1-WT1a_combined", "GZ26005978-IgG1-IgG1_combined", "WT1a_vs_IgG1"],
+    ["GZ26005976-WT1-WT1b_combined", "GZ26005978-IgG1-IgG1_combined", "WT1b_vs_IgG1"],
+    ["GZ26005976-WT1-WT1c_combined", "GZ26005978-IgG1-IgG1_combined", "WT1c_vs_IgG1"],
+    ["GZ26005977-OE1-OE1a_combined", "GZ26005978-IgG1-IgG1_combined", "OE1a_vs_IgG1"],
+    ["GZ26005977-OE1-OE1b_combined", "GZ26005978-IgG1-IgG1_combined", "OE1b_vs_IgG1"],
+    ["GZ26005977-OE1-OE1c_combined", "GZ26005978-IgG1-IgG1_combined", "OE1c_vs_IgG1"],
+    ["GZ26005979-H3K27Me3-1-H3K27Me3-1_combined", "GZ26005978-IgG1-IgG1_combined", "H3K27Me3_1_vs_IgG1"],
+    ["GZ26005980-WT2-WT2a_combined", "GZ26005982-IgG2-IgG2_combined", "WT2a_vs_IgG2"],
+    ["GZ26005980-WT2-WT2b_combined", "GZ26005982-IgG2-IgG2_combined", "WT2b_vs_IgG2"],
+    ["GZ26005980-WT2-WT2c_combined", "GZ26005982-IgG2-IgG2_combined", "WT2c_vs_IgG2"],
+    ["GZ26005981-OE2-OE2a_combined", "GZ26005982-IgG2-IgG2_combined", "OE2a_vs_IgG2"],
+    ["GZ26005981-OE2-OE2b_combined", "GZ26005982-IgG2-IgG2_combined", "OE2b_vs_IgG2"],
+    ["GZ26005981-OE2-OE2c_combined", "GZ26005982-IgG2-IgG2_combined", "OE2c_vs_IgG2"],
+    ["GZ26005983-H3K27Me3-2-H3K27Me3-2_combined", "GZ26005982-IgG2-IgG2_combined", "H3K27Me3_2_vs_IgG2"],
+]
+out = "/mnt/sda/Public/Project/collabration/AoLab/20260206Cut/analysis/callpeak.sample.info"
+with open(out, "w", encoding="utf-8") as f:
+    for r in rows:
+        f.write("\t".join(r) + "\n")
+print(out)
+PY
 
 
+bash pipeline/03_callpeak.sh /mnt/sda/Public/Project/collabration/AoLab/20260206Cut/analysis
 
 
 
