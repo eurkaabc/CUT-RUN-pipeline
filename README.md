@@ -119,6 +119,9 @@ bash pipeline/collect_fastq.sh
 # 1. QC and genome mapping
 bash pipeline/run_qc_map_batch.sh
 
+如果是要得到CPM的bw则跑这个
+bash pipeline/run_qc_map_batch_CPM.sh
+
 # 2. Collect clean FASTQ and CPM bigWig
 bash pipeline/collect_clean_and_bw.sh
 ```
@@ -181,7 +184,7 @@ If you are running this workflow on another server and downloaded the reference 
 
 ```bash
 ref="/mnt/sda/Public/Database/Ecoli"
-chip="/home/bing.pan/software/miniconda3/envs/ChIPseq/bin"
+chip="/mnt/sda/Public/Environment/miniconda3/envs/ChIP/bin"
 ```
 
 Then run:
@@ -224,7 +227,7 @@ If you are running this workflow on another server and downloaded the reference 
 
 ```bash
 ref="/mnt/sda/Public/Database/Drosophila_melanogaster"
-chip="/home/bing.pan/software/miniconda3/envs/ChIPseq/bin"
+chip="/mnt/sda/Public/Environment/miniconda3/envs/ChIP/bin"
 ```
 
 Then run:
