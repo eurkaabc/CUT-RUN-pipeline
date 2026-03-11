@@ -112,6 +112,8 @@ EOF
 
 ### 4. Run the workflow
 
+Run the basic workflow:
+
 ```bash
 # 0. Collect raw FASTQ
 bash pipeline/collect_fastq.sh
@@ -119,11 +121,14 @@ bash pipeline/collect_fastq.sh
 # 1. QC and genome mapping
 bash pipeline/run_qc_map_batch.sh
 
-如果是要得到CPM的bw则跑这个
-bash pipeline/run_qc_map_batch_CPM.sh
-
 # 2. Collect clean FASTQ and CPM bigWig
 bash pipeline/collect_clean_and_bw.sh
+```
+
+If you specifically want CPM-normalized bigWig tracks, run:
+
+```bash
+bash pipeline/run_qc_map_batch_CPM.sh
 ```
 
 ### 5. Prepare spike-in reference
@@ -162,9 +167,8 @@ wget https://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/dm6.chrom.sizes
 gunzip -c dm6.fa.gz > dm6.fa
 bowtie2-build dm6.fa dm6
 ```
+
 Alternatively, you can use the compressed backup package `Ref(spike_in)`, which contains both *E. coli* and `dm6` references.
-
-
 
 </details>
 
@@ -259,8 +263,26 @@ done
 ```
 
 </details>
+### 7. Peak calling
 
-需要修改这里，根据你的实际情况修改：
+Before running peak calling, prepare the following file in the analysis directory:
+
+```text
+callpeak.sample.info
+```
+
+This file defines the treatment/control pairs used for MACS2 peak calling.
+
+Format:
+
+```text
+treatment1    control1    label1
+treatment2    control2    label2
+```
+
+For example, on our lab server, one way to generate this file is:
+
+```bash
 python - <<'PY'
 rows = [
     ["GZ26005976-WT1-WT1a_combined", "GZ26005978-IgG1-IgG1_combined", "WT1a_vs_IgG1"],
@@ -284,11 +306,13 @@ with open(out, "w", encoding="utf-8") as f:
         f.write("\t".join(r) + "\n")
 print(out)
 PY
+```
 
+Then run:
 
+```bash
 bash pipeline/03_callpeak.sh /mnt/sda/Public/Project/collabration/AoLab/20260206Cut/analysis
-
-
+```
 
 ---
 
