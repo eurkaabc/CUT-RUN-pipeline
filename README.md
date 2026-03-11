@@ -85,13 +85,18 @@ conda activate ChIP
 
 ### 3. Prepare config
 
-Before running the pipeline, create `pipeline/project_paths.sh` and edit it according to your local environment.
+Before running the pipeline, please first place the `pipeline/` folder in your working directory or on the server.
+
+Then edit:
+
+```bash
+pipeline/project_paths.sh
+```
 
 Only this file needs to be modified before running the workflow.  
 You do **not** need to edit each pipeline script individually.
 
-Example:
-
+For example, on our lab server, `project_paths.sh` may look like this:
 ```bash
 cat > pipeline/project_paths.sh <<'EOF'
 RAW_SOURCE_DIR="/mnt/sda/Public/Project/collabration/AoLab/20260206Cut/rawdata"
