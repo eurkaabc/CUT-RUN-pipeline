@@ -42,24 +42,152 @@ CUT&RUN can be used for profiling histone marks, transcription factors, and othe
   <img src="https://github.com/SitaoZ/CUT-RUN-snakemake/assets/29169319/052e8504-6a29-4e65-9b79-9978efed0016" />
 </p>
 
+## ⚖️ CUT&RUN vs ChIP-seq
+
+Compared with traditional ChIP-seq, CUT&RUN offers several practical advantages for chromatin profiling, especially in low-input experiments.
+
+### Advantages
+
+- **Lower input requirement**  
+  ChIP-seq often requires around **500,000 cells** or more, whereas CUT&RUN can work with as few as **5,000 cells** in some cases.
+
+- **Lower sequencing depth requirement**  
+  CUT&RUN typically requires about **3–8 million reads per sample**, while ChIP-seq often requires **30 million reads or more**.
+
+- **Lower background noise**  
+  CUT&RUN generates less background because DNA is cleaved and released near the antibody-bound target site, leading to higher signal-to-noise ratio.
+
+- **Lower overall cost**  
+  Reduced input requirements, lower sequencing depth, and often simplified workflows can reduce overall experimental cost.
+
+### Limitations
+
+- **Risk of over-digestion**  
+  Because CUT&RUN relies on calcium-dependent MNase digestion, inappropriate digestion time may lead to over-digestion of DNA. This step requires careful optimization.
+
+- **Not all targets perform equally well**  
+  Depending on the protein of interest, antibody quality and experimental conditions may require additional optimization.
+
+- **Large chromatin complexes may be difficult to release**  
+  In some cases, cleaved chromatin fragments may not efficiently diffuse into the supernatant, especially when large chromatin complexes or strong protein–protein interactions are involved. Additional total DNA extraction strategies may sometimes be needed.
 
 
 ---
 
-## ✨ Pipeline Features
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
-| 🔬 **Quality Control** | Read quality assessment and adapter trimming using `fastp` |
-| 🗺️ **Mapping** | Read alignment using `bowtie2` |
-| 📦 **BAM Processing** | Sorting, duplicate marking, and filtering |
-| 🎯 **Peak Calling** | Statistical peak identification using `MACS2` |
-| 📊 **Normalization** | Optional spike-in calibration using *E. coli* or `dm6` |
-| 📈 **Visualization** | BigWig generation for genome browser display |
-| 📋 **Statistics** | Mapping and quality metrics summarization |
-| 🔁 **Batch Processing** | Helper scripts for common batch steps on our lab server |
+| 🔬 **Read QC and Trimming** | Quality assessment and adapter/quality trimming using `fastp` |
+| 🗺️ **Genome Mapping** | Paired-end alignment using `bowtie2` |
+| 📦 **BAM Processing** | Filtering, sorting, indexing, and duplicate marking using `samtools` and `picard` |
+| 📈 **Signal Track Generation** | CPM or spike-in normalized bigWig generation |
+| 📊 **Spike-in Normalization** | Optional normalization using *E. coli* or `dm6` spike-in |
+| 🎯 **Peak Calling** | Peak identification using `MACS2` |
+| 🔥 **Heatmap Analysis** | Signal visualization with `deepTools` |
+| 📑 **QC Reporting** | Cross-sample QC aggregation using `MultiQC` |
+| 🔁 **Batch Processing** | Batch wrappers for routine server-side analysis |
 
 ---
+## 🧭 Pipeline Summary
+
+The workflow currently includes the following major steps:
+
+1. Collect raw paired-end FASTQ files
+2. Perform read QC and trimming with `fastp`
+3. Align reads to the target genome with `bowtie2`
+4. Filter, sort, index, and mark duplicates in BAM files
+5. Generate CPM-normalized bigWig tracks
+6. Summarize QC results with `MultiQC`
+7. Collect clean FASTQ files and bigWig outputs
+8. Align reads to an optional spike-in genome (`E. coli` or `dm6`)
+9. Calculate spike-in mapping ratios
+10. Generate spike-in-normalized bigWig tracks
+11. Call peaks with `MACS2`
+12. Perform downstream visualization such as heatmap analysis
+
+---
+
+## 📁 Repository Structure
+
+```bash
+CUT-RUN-pipeline/
+├── README.md
+├── LICENSE
+├── .gitignore
+├── scripts/
+│   ├── 01_qc_map.sh
+│   ├── 01_qc_map_CPM.sh
+│   ├── 02_map_ecoli.sh
+│   ├── 02_map_dm6.sh
+│   ├── 03_callpeak.sh
+│   ├── 03_callpeak_spikeIN.sh
+│   ├── bam2bw.sh
+│   ├── stat.map.sh
+│   ├── collect_fastq.sh
+│   ├── collect_clean_and_bw.sh
+│   ├── run_qc_map_batch.sh
+│   ├── run_qc_map_batch_CPM.sh
+│   ├── run_ecoli_batch.sh
+│   ├── calc_ecoli_ratio.sh
+│   ├── make_spike_bw.sh
+│   └── q30_plot.py
+├── config/
+│   └── project_paths.example.sh
+├── docs/
+│   └── workflow.md
+└── LICENSE
+
+```
+
+### 📊 Pipeline Workflow ###
+
+```
+Raw FASTQ Files
+      ↓
+collect_fastq.sh
+      ↓
+analysis/1.data
+      ↓
+┌─────────────────────────────────────┐
+│  Step 1: 01_qc_map.sh               │
+│  • Quality Control (fastp)          │
+│  • Read Trimming                    │
+│  • Genome Alignment (bowtie2)       │
+│  • BAM Processing                   │
+│  • CPM bigWig Generation            │
+└─────────────────────────────────────┘
+      ↓
+collect_clean_and_bw.sh
+      ↓
+analysis/2.cleandata + analysis/Bw
+      ↓
+┌─────────────────────────────────────┐
+│  Step 2A: 02_map_ecoli.sh           │
+│  • E. coli spike-in mapping         │
+└─────────────────────────────────────┘
+                OR
+┌─────────────────────────────────────┐
+│  Step 2B: 02_map_dm6.sh             │
+│  • dm6 spike-in mapping             │
+└─────────────────────────────────────┘
+      ↓
+spike-in mapping statistics
+      ↓
+spike-in normalization
+      ↓
+make_spike_bw.sh
+      ↓
+┌─────────────────────────────────────┐
+│  Step 3: Peak Calling               │
+│  • 03_callpeak.sh                   │
+│  • 03_callpeak_spikeIN.sh           │
+│  • MACS2 peak detection             │
+│  • deepTools heatmap analysis       │
+└─────────────────────────────────────┘
+      ↓
+Peak files + normalized tracks
+```
 
 ## 🚀 Usage Guide
 
