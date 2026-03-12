@@ -35,9 +35,11 @@ The pAG-MNase fusion protein is then recruited to the antibody-bound chromatin r
 
 Purified DNA is subsequently used for library construction, genome alignment, signal track generation, and peak calling.
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/7b39a0a1-51df-4588-9cdb-429555fd6ef6" alt="CUT&RUN workflow" width="420">
-</p>
+CUT&RUN can be used for profiling histone marks, transcription factors, and other chromatin-associated proteins, and is widely used as an efficient alternative to ChIP-seq in many applications.
+
+![cut_run](https://github.com/SitaoZ/CUT-RUN-snakemake/assets/29169319/052e8504-6a29-4e65-9b79-9978efed0016)
+
+
 
 ---
 
@@ -839,5 +841,15 @@ Contributions are welcome through pull requests or issue reports.
 This pipeline builds on the CUT&RUN and ChIP-seq analysis ecosystem and the excellent open-source bioinformatics tools used throughout the workflow.
 
 ---
+加上和Chip-seq的区别
+###  优点
+- 需要更少的上样量。ChIP需要500K cells, 而CUT&RUN最少可低至5K cells。
+- 测序深度要求不高。CUT&RUN 每个样本测3-8M read/sample,而ChIP-Seq则需要大于等于30M read/sample。
+- 背景噪音显著减少，因为CUN&RUN是目标片段测序。
+- 成本减少。因为抗体的使用减少，建库测序的深度减少。
+### 缺点
+- 由于钙依赖性MNase反应时间不合适，可能导致DNA过度消化。类似的限制存在于现在的ChIP-seq操作中，酶或超声DNA打断必须优化。
+- 并不是所有的蛋白质都适用于该方案。根据感兴趣的蛋白质，可能需要摸索实验条件。
+- 可能是染色质复合物太大而无法扩散出去，或者蛋白质-蛋白质相互作用保留了被切割的复合物。在这种情况下，需要消化后才能提取总DNA。
 
 ⭐ If you find this pipeline useful, please consider giving it a star.
