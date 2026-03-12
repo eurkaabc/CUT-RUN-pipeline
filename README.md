@@ -39,9 +39,6 @@ Purified DNA is subsequently used for library construction, genome alignment, si
   <img src="https://github.com/user-attachments/assets/7b39a0a1-51df-4588-9cdb-429555fd6ef6" alt="CUT&RUN workflow" width="420">
 </p>
 
-
-
-
 ---
 
 ## ✨ Pipeline Features
@@ -52,22 +49,16 @@ Purified DNA is subsequently used for library construction, genome alignment, si
 | 🗺️ **Mapping** | Read alignment using `bowtie2` |
 | 📦 **BAM Processing** | Sorting, duplicate marking, and filtering |
 | 🎯 **Peak Calling** | Statistical peak identification using `MACS2` |
-| 📊 **Normalization** | Spike-in calibration using *E. coli* |
+| 📊 **Normalization** | Optional spike-in calibration using *E. coli* or `dm6` |
 | 📈 **Visualization** | BigWig generation for genome browser display |
 | 📋 **Statistics** | Mapping and quality metrics summarization |
-| 🔁 **Batch Processing** | Convenient wrapper scripts for running all samples |
+| 🔁 **Batch Processing** | Helper scripts for common batch steps on our lab server |
 
 ---
 
+## 🚀 Usage Guide
 
-### 1. Installation
-
-```bash
-git clone https://github.com/eurkaabc/CUT-RUN-pipeline.git
-cd CUT-RUN-pipeline
-chmod +x pipeline/*.sh
-```
-### 2. Prepare environment
+### 1. Prepare environment
 
 For example, on our lab server, the pipeline is usually run in the following conda environment:
 
@@ -82,7 +73,7 @@ conda env create -f environment.yml
 conda activate ChIP
 ```
 
-### 3. Prepare config
+### 2. Prepare config
 
 Before running the pipeline, please first place the `pipeline/` folder in your working directory or on the server.
 
@@ -96,6 +87,7 @@ Only this file needs to be modified before running the workflow.
 You do **not** need to edit each pipeline script individually.
 
 For example, on our lab server, `project_paths.sh` may look like this:
+
 ```bash
 cat > pipeline/project_paths.sh <<'EOF'
 RAW_SOURCE_DIR="/mnt/sda/Public/Project/collabration/AoLab/20260206Cut/rawdata"
@@ -109,9 +101,7 @@ PAIR_MODE="yes"
 EOF
 ```
 
-### 4. Run the workflow
-
-Run the basic workflow:
+### 3. Run the basic workflow
 
 ```bash
 # 0. Collect raw FASTQ
@@ -130,7 +120,9 @@ If you specifically want CPM-normalized bigWig tracks, run:
 bash pipeline/run_qc_map_batch_CPM.sh
 ```
 
-### 5. Prepare spike-in reference
+In practice, the raw/original version is often used first for initial track inspection, while the CPM version is used for downstream comparison and visualization.
+
+### 4. Prepare spike-in reference
 
 Spike-in mapping depends on the experimental design.  
 Different spike-in species require different reference genomes and alignment indexes.
@@ -171,7 +163,7 @@ Alternatively, you can use the compressed backup package `Ref(spike_in)`, which 
 
 </details>
 
-### 6. Spike-in mapping options
+### 5. Spike-in mapping options
 
 Choose the appropriate spike-in mapping script according to your experimental design:
 
@@ -262,7 +254,8 @@ done
 ```
 
 </details>
-### 7. Peak calling
+
+### 6. Peak calling
 
 Before running peak calling, prepare the following file in the analysis directory:
 
@@ -277,6 +270,12 @@ Format:
 ```text
 treatment1    control1    label1
 treatment2    control2    label2
+```
+
+The corresponding BAM files should already exist under:
+
+```text
+analysis/01_qc_map/<sample>/<sample>.final.bam
 ```
 
 For example, on our lab server, one way to generate this file is:
@@ -312,6 +311,17 @@ Then run:
 ```bash
 bash pipeline/03_callpeak.sh /mnt/sda/Public/Project/collabration/AoLab/20260206Cut/analysis
 ```
+
+---
+
+## 📝 Notes
+
+- `run_qc_map_batch.sh` is mainly used to generate the original/raw version for initial inspection.
+- `run_qc_map_batch_CPM.sh` is mainly used to generate CPM-normalized bigWig tracks for downstream comparison and visualization.
+- Peak calling is usually performed against the corresponding IgG control.
+- WT and OE are biological groups and are usually compared after each sample has first been called against IgG.
+
+---
 
 ---
 
