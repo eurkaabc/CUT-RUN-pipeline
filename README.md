@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Language: Bash](https://img.shields.io/badge/Language-Bash-green.svg)](https://www.gnu.org/software/bash/)
-[![Python: 3.6+](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://www.python.org/)
+[![Python: 3.9+](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 
 A practical shell-based bioinformatics pipeline for analyzing CUT&RUN (Cleavage Under Targets and Release Using Nuclease) data.
 
@@ -59,7 +59,6 @@ Purified DNA is subsequently used for library construction, genome alignment, si
 
 ---
 
-## 🚀 Quick Start
 
 ### 1. Installation
 
