@@ -37,7 +37,10 @@ Purified DNA is subsequently used for library construction, genome alignment, si
 
 CUT&RUN can be used for profiling histone marks, transcription factors, and other chromatin-associated proteins, and is widely used as an efficient alternative to ChIP-seq in many applications.
 
-![cut_run](https://github.com/SitaoZ/CUT-RUN-snakemake/assets/29169319/052e8504-6a29-4e65-9b79-9978efed0016)
+
+<p align="center">
+  <img src="https://github.com/SitaoZ/CUT-RUN-snakemake/assets/29169319/052e8504-6a29-4e65-9b79-9978efed0016" />
+</p>
 
 
 
